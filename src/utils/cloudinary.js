@@ -16,7 +16,7 @@ const uploadOnCloudinary = async (file) => {
         resource_type: "auto",
     })
     //file is uploaded successfully
-    console.log("File uploaded successfully",response);
+    console.log("File uploaded successfully",response.url);
     return response;
 }
     catch(error){
@@ -27,4 +27,4 @@ const uploadOnCloudinary = async (file) => {
 
 }
 
-export default uploadOnCloudinary;
+export {uploadOnCloudinary};
