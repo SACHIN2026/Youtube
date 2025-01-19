@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
     try {
@@ -159,7 +160,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const loggedOutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(req.user._id,
         {
-            $set: { refreshToken: undefined }
+            $unset: { refreshToken: 1 }
         },
         {
             new: true,
@@ -222,7 +223,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 export const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
-    const user = await User.findById(req.user?._id);  //potential error
+    const user = await User.findById(req.user?._id);  //potential error api error
     const isPasswordCorrect = await user.isPasswordCorrect(currentPassword);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid password");
@@ -243,6 +244,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 
 export const updateAccountDetails = asyncHandler(async (req, res) => {
     const { fullname, email } = req.body;
+    // console.log(fullname, email) // error in api
     if (!fullname || !email) {
         throw new ApiError(400, "All fields are required");
     }
@@ -288,7 +290,7 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
 
 export const updateUserCoverImage = asyncHandler(async (req, res) => {
     const CoverImageLocalPath = req.file?.path;
-    if (!avatarLocalPath) {
+    if (!CoverImageLocalPath) {
         throw new ApiError(400, "Cover image is missing");
     }
 
